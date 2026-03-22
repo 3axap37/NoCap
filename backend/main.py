@@ -1,23 +1,64 @@
-from fastapi import FastAPI, File, HTTPException, UploadFile
+import os
+import uuid
+import time
+import threading
+from fastapi import FastAPI, File, HTTPException, UploadFile, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 
 from excel_generator import generate_excel
-from models import GenerateExcelRequest, ParsePdfResponse
+from models import GenerateExcelRequest, JobCreatedResponse, JobStatusResponse
 from pdf_parser_v2 import parse_shareholders_from_pdf
 
 app = FastAPI(title="Cap Table API")
 
+# --- CORS (environment-variable driven) ---
+_allowed_raw = os.getenv(
+    "ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+)
+_origins = [o.strip() for o in _allowed_raw.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# --- In-memory job store ---
+_jobs: dict[str, dict] = {}
+_JOB_TTL_SECONDS = 30 * 60  # 30 minutes
 
-@app.post("/api/parse-pdf", response_model=ParsePdfResponse)
-async def parse_pdf(file: UploadFile = File(...)):
+
+def _cleanup_old_jobs() -> None:
+    """Remove jobs older than TTL."""
+    now = time.time()
+    expired = [jid for jid, j in _jobs.items() if now - j.get("created", 0) > _JOB_TTL_SECONDS]
+    for jid in expired:
+        _jobs.pop(jid, None)
+
+
+def _run_parse(job_id: str, content: bytes) -> None:
+    """Background task: run PDF parsing and store result."""
+    try:
+        shareholders, warning = parse_shareholders_from_pdf(content)
+        _jobs[job_id].update({
+            "status": "completed",
+            "shareholders": [sh.dict() for sh in shareholders],
+            "parseWarning": warning,
+        })
+    except Exception as e:
+        _jobs[job_id].update({
+            "status": "failed",
+            "error": str(e),
+        })
+
+
+# --- Endpoints ---
+
+
+@app.post("/api/parse-pdf", response_model=JobCreatedResponse)
+async def parse_pdf(file: UploadFile = File(...), background_tasks: BackgroundTasks = BackgroundTasks()):
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="PDF 파일을 업로드해 주세요.")
 
@@ -25,15 +66,28 @@ async def parse_pdf(file: UploadFile = File(...)):
     if len(content) == 0:
         raise HTTPException(status_code=400, detail="빈 파일입니다.")
 
-    try:
-        shareholders, warning = parse_shareholders_from_pdf(content)
-    except Exception as exc:
-        raise HTTPException(
-            status_code=422,
-            detail=f"PDF 파싱 중 오류가 발생했습니다: {exc}",
-        )
+    # Cleanup old jobs periodically
+    _cleanup_old_jobs()
 
-    return ParsePdfResponse(shareholders=shareholders, parseWarning=warning)
+    job_id = str(uuid.uuid4())
+    _jobs[job_id] = {"status": "processing", "created": time.time()}
+    background_tasks.add_task(_run_parse, job_id, content)
+
+    return JobCreatedResponse(jobId=job_id)
+
+
+@app.get("/api/status/{job_id}", response_model=JobStatusResponse)
+async def get_status(job_id: str):
+    if job_id not in _jobs:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    job = _jobs[job_id]
+    return JobStatusResponse(
+        status=job["status"],
+        shareholders=job.get("shareholders"),
+        parseWarning=job.get("parseWarning"),
+        error=job.get("error"),
+    )
 
 
 @app.post("/api/generate-excel")

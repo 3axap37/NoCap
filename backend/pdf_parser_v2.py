@@ -412,7 +412,7 @@ _SC_PAT = re.compile(r'^\d{1,3}(?:,\d{3})+주?$|^\d{3,}주$')
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 CLOVA_OCR_INVOKE_URL = os.getenv("CLOVA_OCR_INVOKE_URL", "")
 CLOVA_OCR_SECRET = os.getenv("CLOVA_OCR_SECRET", "")
-POPPLER_PATH = r"C:\poppler\Library\bin"
+POPPLER_PATH = os.getenv("POPPLER_PATH") or None
 
 logger = logging.getLogger(__name__)
 

@@ -25,3 +25,17 @@ class GenerateExcelRequest(BaseModel):
     shareholders: list[Shareholder]
     leadInvestorAmount: int
     coInvestors: list[CoInvestor] = []
+
+
+# --- Async job models ---
+
+
+class JobCreatedResponse(BaseModel):
+    jobId: str
+
+
+class JobStatusResponse(BaseModel):
+    status: str  # "processing" | "completed" | "failed"
+    shareholders: Optional[list[Shareholder]] = None
+    parseWarning: Optional[str] = None
+    error: Optional[str] = None

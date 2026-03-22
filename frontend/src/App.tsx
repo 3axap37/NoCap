@@ -18,6 +18,7 @@ export default function App() {
 
   // Step 1
   const [parseLoading, setParseLoading] = useState(false);
+  const [parseStatusMsg, setParseStatusMsg] = useState<string | null>(null);
   const [parseWarning, setParseWarning] = useState<string | null>(null);
   const [parseError, setParseError] = useState<string | null>(null);
 
@@ -43,8 +44,9 @@ export default function App() {
     setParseLoading(true);
     setParseError(null);
     setParseWarning(null);
+    setParseStatusMsg(null);
     try {
-      const res = await parsePdf(file);
+      const res = await parsePdf(file, setParseStatusMsg);
       setShareholders(res.shareholders);
       setParseWarning(res.parseWarning ?? null);
       setStep(2);
@@ -52,6 +54,7 @@ export default function App() {
       setParseError(e instanceof Error ? e.message : String(e));
     } finally {
       setParseLoading(false);
+      setParseStatusMsg(null);
     }
   }
 
@@ -155,6 +158,15 @@ export default function App() {
                 Step 1: 주주명부 PDF 업로드
               </h2>
               <PdfUpload onParsed={handlePdfParsed} loading={parseLoading} />
+              {parseLoading && parseStatusMsg && (
+                <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-700 flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  {parseStatusMsg}
+                </div>
+              )}
               {parseError && (
                 <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
                   {parseError}
