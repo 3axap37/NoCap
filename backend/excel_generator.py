@@ -23,7 +23,7 @@ from models import GenerateExcelRequest
 # Constants
 # ---------------------------------------------------------------------------
 
-REFERENCE_FILE = Path(__file__).parent.parent / "CapTableExample.xlsx"
+REFERENCE_FILE = Path(__file__).parent / "CapTableExample.xlsx"
 
 LEAD_INVESTOR_NAME = "한투 바른동행 셰르파 제4호 펀드"
 
