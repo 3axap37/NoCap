@@ -9,6 +9,7 @@ export interface Shareholder {
 export interface CoInvestor {
   name: string;
   amount: number;
+  shareType: string;
 }
 
 export interface ParsePdfResponse {
@@ -21,7 +22,9 @@ export interface GenerateExcelRequest {
   round: string;
   preMoney: number;
   shareholders: Shareholder[];
+  leadInvestorName: string;
   leadInvestorAmount: number;
+  leadInvestorShareType: string;
   coInvestors: CoInvestor[];
 }
 

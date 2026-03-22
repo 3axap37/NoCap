@@ -11,6 +11,7 @@ class Shareholder(BaseModel):
 class CoInvestor(BaseModel):
     name: str
     amount: int
+    shareType: str = "RCPS"
 
 
 class ParsePdfResponse(BaseModel):
@@ -23,7 +24,9 @@ class GenerateExcelRequest(BaseModel):
     round: str
     preMoney: int
     shareholders: list[Shareholder]
+    leadInvestorName: str
     leadInvestorAmount: int
+    leadInvestorShareType: str = "RCPS"
     coInvestors: list[CoInvestor] = []
 
 

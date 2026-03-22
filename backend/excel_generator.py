@@ -25,8 +25,6 @@ from models import GenerateExcelRequest
 
 REFERENCE_FILE = Path(__file__).parent / "CapTableExample.xlsx"
 
-LEAD_INVESTOR_NAME = "한투 바른동행 셰르파 제4호 펀드"
-
 KRW_FMT = '_-* #,##0_-;\\-* #,##0_-;_-* "-"_-;_-@_-'
 PCT_FMT = "0.00%"
 
@@ -77,8 +75,8 @@ def generate_excel(req: GenerateExcelRequest) -> bytes:
     N = len(req.shareholders)
 
     all_investors = [
-        {"name": LEAD_INVESTOR_NAME, "amount": req.leadInvestorAmount}
-    ] + [{"name": inv.name, "amount": inv.amount} for inv in req.coInvestors]
+        {"name": req.leadInvestorName, "amount": req.leadInvestorAmount, "shareType": req.leadInvestorShareType}
+    ] + [{"name": inv.name, "amount": inv.amount, "shareType": inv.shareType} for inv in req.coInvestors]
     M = len(all_investors)
 
     # ---- Row layout (dynamic) ----
@@ -243,7 +241,7 @@ def generate_excel(req: GenerateExcelRequest) -> bytes:
         new_row = ROW_NEW_FIRST + i
         ws[f"C{new_row}"] = investor["name"]
         _apply_style("C34", ws[f"C{new_row}"])
-        ws[f"D{new_row}"] = "RCPS"
+        ws[f"D{new_row}"] = investor["shareType"]
         _apply_style("D34", ws[f"D{new_row}"])
         ws[f"E{new_row}"] = f"=F{shares_row}"
         _apply_style("E34", ws[f"E{new_row}"])

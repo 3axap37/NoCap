@@ -1,5 +1,7 @@
 import { CoInvestor } from "../api";
 
+const SHARE_TYPES = ["보통주", "우선주", "RCPS"] as const;
+
 interface Props {
   coInvestors: CoInvestor[];
   onChange: (list: CoInvestor[]) => void;
@@ -14,7 +16,7 @@ export default function CoInvestorList({ coInvestors, onChange }: Props) {
   }
 
   function addRow() {
-    onChange([...coInvestors, { name: "", amount: 0 }]);
+    onChange([...coInvestors, { name: "", amount: 0, shareType: "RCPS" }]);
   }
 
   function removeRow(index: number) {
@@ -40,14 +42,25 @@ export default function CoInvestorList({ coInvestors, onChange }: Props) {
               <input
                 type="number"
                 min={0}
-                step={1000000}
+                step={1}
                 value={inv.amount}
                 onChange={(e) =>
                   update(i, "amount", parseInt(e.target.value) || 0)
                 }
-                placeholder="투자금액 (원)"
-                className="w-40 border rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="백만원"
+                className="w-32 border rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
+              <select
+                value={inv.shareType}
+                onChange={(e) => update(i, "shareType", e.target.value)}
+                className="w-24 border rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                {SHARE_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
               <button
                 onClick={() => removeRow(i)}
                 className="text-red-400 hover:text-red-600 font-bold text-xl leading-none px-1"

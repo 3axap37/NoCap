@@ -33,20 +33,20 @@ export default function ValuationForm({
 
       <div className="space-y-1">
         <label className="block text-sm font-medium text-gray-700">
-          투자 전 기업 가치 (Pre-money, 원)
+          투자 전 기업 가치 (Pre-money, 백만원)
         </label>
         <input
           type="number"
           min={0}
-          step={1000000}
+          step={1}
           value={preMoney}
           onChange={(e) => onPreMoney(e.target.value)}
-          placeholder="9500000000"
+          placeholder="9500"
           className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         {preMoney && !isNaN(Number(preMoney)) && Number(preMoney) > 0 && (
           <p className="text-xs text-gray-500">
-            {Number(preMoney).toLocaleString("ko-KR")} 원
+            {(Number(preMoney) * 1_000_000).toLocaleString("ko-KR")} 원
           </p>
         )}
       </div>

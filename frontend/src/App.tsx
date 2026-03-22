@@ -31,7 +31,9 @@ export default function App() {
   const [preMoney, setPreMoney] = useState("");
 
   // Step 3
+  const [leadName, setLeadName] = useState("");
   const [leadAmount, setLeadAmount] = useState("");
+  const [leadShareType, setLeadShareType] = useState("RCPS");
   const [coInvestors, setCoInvestors] = useState<CoInvestor[]>([]);
 
   // Step 4
@@ -72,6 +74,7 @@ export default function App() {
 
   function step3Valid() {
     return (
+      leadName.trim() !== "" &&
       Number(leadAmount) > 0 &&
       coInvestors.every((inv) => inv.name.trim() !== "" && inv.amount > 0)
     );
@@ -84,10 +87,15 @@ export default function App() {
       await generateExcel({
         companyName: companyName.trim(),
         round,
-        preMoney: Number(preMoney),
+        preMoney: Number(preMoney) * 1_000_000,
         shareholders,
-        leadInvestorAmount: Number(leadAmount),
-        coInvestors,
+        leadInvestorName: leadName.trim(),
+        leadInvestorAmount: Number(leadAmount) * 1_000_000,
+        leadInvestorShareType: leadShareType,
+        coInvestors: coInvestors.map((inv) => ({
+          ...inv,
+          amount: inv.amount * 1_000_000,
+        })),
       });
     } catch (e) {
       setDownloadError(e instanceof Error ? e.message : String(e));
@@ -232,7 +240,14 @@ export default function App() {
                 Step 3: 투자 정보 입력
               </h2>
 
-              <LeadInvestorForm amount={leadAmount} onAmount={setLeadAmount} />
+              <LeadInvestorForm
+                name={leadName}
+                amount={leadAmount}
+                shareType={leadShareType}
+                onName={setLeadName}
+                onAmount={setLeadAmount}
+                onShareType={setLeadShareType}
+              />
               <CoInvestorList coInvestors={coInvestors} onChange={setCoInvestors} />
 
               <div className="flex justify-between pt-2">
@@ -271,15 +286,19 @@ export default function App() {
                 </div>
                 <div className="flex justify-between">
                   <span className="font-medium">Pre-money</span>
-                  <span>{Number(preMoney).toLocaleString("ko-KR")} 원</span>
+                  <span>{(Number(preMoney) * 1_000_000).toLocaleString("ko-KR")} 원</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="font-medium">주주 수</span>
                   <span>{shareholders.length}명</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-medium">리드 투자금액</span>
-                  <span>{Number(leadAmount).toLocaleString("ko-KR")} 원</span>
+                  <span className="font-medium">당사 투자 펀드</span>
+                  <span>{leadName} ({leadShareType})</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">투자금액</span>
+                  <span>{(Number(leadAmount) * 1_000_000).toLocaleString("ko-KR")} 원</span>
                 </div>
                 {coInvestors.length > 0 && (
                   <div className="flex justify-between">
