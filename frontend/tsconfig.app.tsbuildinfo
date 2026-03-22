@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/api.ts","./src/main.tsx","./src/components/coinvestorlist.tsx","./src/components/leadinvestorform.tsx","./src/components/pdfupload.tsx","./src/components/roundselector.tsx","./src/components/shareholdertable.tsx","./src/components/valuationform.tsx"],"version":"5.7.3"}

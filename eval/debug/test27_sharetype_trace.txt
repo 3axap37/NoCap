@@ -1,0 +1,45 @@
+============================================================
+  ShareType Diagnosis: Test27
+============================================================
+
+--- Page 1 ---
+
+[Stage 1] OCR words containing share type keywords
+  None found
+
+[Stage 2] Reconstructed rows from OCR words
+  Row 0: name="서울 관악구 조원로 25 104동 김동균 스테이트뉴포레)", share_type="", share_count=10250, raw_cells=['서울 관악구 조원로 25 104동 김동균 스테이트뉴포레)', '10,250']
+  Row 1: name="한투 바른동행 서울 강남구 역삼로 577 4층 (대치동, 셰르파 제1호 펀드 워)", share_type="", share_count=250, raw_cells=['한투 바른동행 서울 강남구 역삼로 577 4층 (대치동, 셰르파 제1호 펀드 워)', '250']
+
+[Stage 3] has_share_type_col check
+  sc_x1_min = 1899
+  has_share_type_col = False
+  Detail: words that normalize to known share types:
+
+[Stage 4] OCR suffix sent to VLM
+  (total 11 lines, showing first 15)
+  【OCR 보조 데이터 — 감지된 주주 2명】
+  아래 주주들을 반드시 포함하여 출력하세요. 이미지에서 추가 주주가 보이면 함께 포함하세요.
+  주주명은 반드시 이미지를 참조하여 정확하게 완성하세요 (OCR 이름은 불완전할 수 있습니다).
+  주식수와 주식종류는 아래 값을 그대로 사용하세요.
+  
+  ※ '...'로 끝나는 이름은 OCR이 일부만 감지한 것입니다.
+     이미지에서 해당 행을 직접 찾아 전체 이름을 정확하게 기입하세요.
+     이미지에서 읽기 어려우면 OCR이 감지한 앞부분(... 이전)만 기입하고 추측하지 마세요.
+  
+  1: 김동균... | 10,250
+  2: 한투 바른동행... | 250
+
+[Stage 5] VLM response
+  Item 0: name="김동균", shareType="", shareCount=10250
+  Item 1: name="한투 바른동행 세르파 제1호 펀드", shareType="", shareCount=250
+
+[Stage 6] OCR share_type map
+  Empty (no 3-cell rows with valid share types)
+  Detail — clova_rows cell counts:
+    Row 0: 2 cells -> ['서울 관악구 조원로 25 104동 김동균 스테이트뉴포레)', '10,250']
+    Row 1: 2 cells -> ['한투 바른동행 서울 강남구 역삼로 577 4층 (대치동, 셰르파 제1호 펀드 워)', '250']
+
+[Stage 7] Final rows (after post_validate + ocr_st_correction)
+  Row 0: name="김동균", share_type="", share_count=10250, flags=[]
+  Row 1: name="한투 바른동행 세르파 제1호 펀드", share_type="", share_count=250, flags=[]

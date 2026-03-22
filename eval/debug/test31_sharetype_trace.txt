@@ -1,0 +1,58 @@
+============================================================
+  ShareType Diagnosis: Test31
+============================================================
+
+--- Page 1 ---
+
+[Stage 1] OCR words containing share type keywords
+  None found
+
+[Stage 2] Reconstructed rows from OCR words
+  Row 0: name="임정빈 580810-******* 한투바른동행 - 셰르파 제1호 펀드 최준영 810602-******* 제이씨에이치 오라클스타트업펀드 오라클 지역 790 - 뉴딜벤처펀드", share_type="", share_count=58, raw_cells=['임정빈 580810-******* 한투바른동행 - 셰르파 제1호 펀드 최준영 810602-******* 제이씨에이치 오라클스타트업펀드 오라클 지역 790 - 뉴딜벤처펀드', '58']
+  Row 1: name="1주당 금500원 위 주주명부는 본사에 비치된 주주명부와", share_type="", share_count=53948000, raw_cells=['1주당 금500원 위 주주명부는 본사에 비치된 주주명부와', '53,948,000']
+  Row 2: name="12월 회사명 : 주식회사 티엔에이치텍 소재지 충청남도 천안시 서북구 성환읍 : 15324호(남서울대학교 지식정보관) 사내이사 : 주 학식", share_type="", share_count=91, raw_cells=['12월 회사명 : 주식회사 티엔에이치텍 소재지 충청남도 천안시 서북구 성환읍 : 15324호(남서울대학교 지식정보관) 사내이사 : 주 학식', '91']
+
+[Stage 3] has_share_type_col check
+  sc_x1_min = 1743
+  has_share_type_col = False
+  Detail: words that normalize to known share types:
+
+[Stage 4] OCR suffix sent to VLM
+  (total 12 lines, showing first 15)
+  【OCR 보조 데이터 — 감지된 주주 3명】
+  아래 주주들을 반드시 포함하여 출력하세요. 이미지에서 추가 주주가 보이면 함께 포함하세요.
+  주주명은 반드시 이미지를 참조하여 정확하게 완성하세요 (OCR 이름은 불완전할 수 있습니다).
+  주식수와 주식종류는 아래 값을 그대로 사용하세요.
+  
+  ※ '...'로 끝나는 이름은 OCR이 일부만 감지한 것입니다.
+     이미지에서 해당 행을 직접 찾아 전체 이름을 정확하게 기입하세요.
+     이미지에서 읽기 어려우면 OCR이 감지한 앞부분(... 이전)만 기입하고 추측하지 마세요.
+  
+  1: 임정빈 580810-******* 한투바른동행 - 셰르파 제1호 펀드 최준영 810602-******* 제이씨에이치 오라클스타트업펀드 오라클 지역 790 - 뉴딜벤처펀드 | 58
+  2: 1주당 금500원 위 주주명부는 본사에 비치된 주주명부와 | 53,948,000
+  3: 12월 회사명 : 주식회사 티엔에이치텍 소재지... | 91
+
+[Stage 5] VLM response
+  Item 0: name="주학식", shareType="", shareCount=77272
+  Item 1: name="차윤석", shareType="", shareCount=11364
+  Item 2: name="임정빈", shareType="", shareCount=9091
+  Item 3: name="한투 바른동행 셰르파 제1호 펀드", shareType="", shareCount=5264
+  Item 4: name="최준영", shareType="", shareCount=2273
+  Item 5: name="제이씨에이치 오라클스타트업펀드", shareType="", shareCount=1842
+  Item 6: name="오라클 지역 뉴딜벤처펀드", shareType="", shareCount=790
+
+[Stage 6] OCR share_type map
+  Empty (no 3-cell rows with valid share types)
+  Detail — clova_rows cell counts:
+    Row 0: 2 cells -> ['임정빈 580810-******* 한투바른동행 - 셰르파 제1호 펀드 최준영 810602-******* 제이씨에이치 오라클스타트업펀드 오라클 지역 790 - 뉴딜벤처펀드', '58']
+    Row 1: 2 cells -> ['1주당 금500원 위 주주명부는 본사에 비치된 주주명부와', '53,948,000']
+    Row 2: 2 cells -> ['12월 회사명 : 주식회사 티엔에이치텍 소재지 충청남도 천안시 서북구 성환읍 : 15324호(남서울대학교 지식정보관) 사내이사 : 주 학식', '91']
+
+[Stage 7] Final rows (after post_validate + ocr_st_correction)
+  Row 0: name="주학식", share_type="", share_count=77272, flags=[]
+  Row 1: name="차윤석", share_type="", share_count=11364, flags=[]
+  Row 2: name="임정빈", share_type="", share_count=9091, flags=[]
+  Row 3: name="한투 바른동행 셰르파 제1호 펀드", share_type="", share_count=5264, flags=[]
+  Row 4: name="최준영", share_type="", share_count=2273, flags=[]
+  Row 5: name="제이씨에이치 오라클스타트업펀드", share_type="", share_count=1842, flags=[]
+  Row 6: name="오라클 지역 뉴딜벤처펀드", share_type="", share_count=790, flags=[]
